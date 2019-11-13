@@ -245,18 +245,22 @@ class ContributionGraph extends AbstractChart {
     );
   }
 
+  isMonthLabel(endOfWeek) {
+    return endOfWeek.getDate() >= 1 && endOfWeek.getDate() <= DAYS_IN_WEEK;
+  }
+
   renderMonthLabels() {
     if (!this.props.showMonthLabels) {
       return null;
     }
-    const weekRange = _.range(this.getWeekCount() - 1); // don't render for last week, because label will be cut off
+    const weekRange = _.range(this.getWeekCount());
     return weekRange.map(weekIndex => {
       const endOfWeek = shiftDate(
         this.getStartDateWithEmptyDays(),
-        (weekIndex + 1) * DAYS_IN_WEEK
+        weekIndex * DAYS_IN_WEEK
       );
       const [x, y] = this.getMonthLabelCoordinates(weekIndex);
-      return endOfWeek.getDate() >= 1 && endOfWeek.getDate() <= DAYS_IN_WEEK ? (
+      return this.isMonthLabel(endOfWeek) ? (
         <Text
           key={weekIndex}
           x={x}
@@ -269,6 +273,30 @@ class ContributionGraph extends AbstractChart {
     });
   }
 
+  renderWeekLabels() {
+    if (!this.props.showWeekLabels) {
+      return null;
+    }
+
+    const weekRange = _.range(this.getWeekCount());
+    return weekRange.map(weekIndex => {
+      const endOfWeek = shiftDate(
+        this.getStartDateWithEmptyDays(),
+        weekIndex * DAYS_IN_WEEK
+      );
+      const [x, y] = this.getMonthLabelCoordinates(weekIndex);
+      return !this.isMonthLabel(endOfWeek) ? (
+        <Text
+          key={weekIndex}
+          x={x}
+          y={y}
+          {...this.getPropsForLabels()}
+        >
+          {`${endOfWeek.getDate()}`}
+        </Text>
+      ) : null;
+    });
+  }
   getSquareXOffset() {
     if (this.props.horizontal) {
       return 0;
@@ -299,6 +327,7 @@ class ContributionGraph extends AbstractChart {
             ry={borderRadius}
             fill="url(#backgroundGradient)"
           />
+          <G>{this.renderWeekLabels()}</G>
           <G>{this.renderMonthLabels()}</G>
           <G>{this.renderAllWeeks()}</G>
         </Svg>
@@ -328,6 +357,7 @@ ContributionGraph.ViewPropTypes = {
   squareSize: PropTypes.number, // size of squares
   horizontal: PropTypes.bool, // whether to orient horizontally or vertically
   showMonthLabels: PropTypes.bool, // whether to show month labels
+  showWeekLabels: PropTypes.bool, // whether to show month labels
   showOutOfRangeDays: PropTypes.bool, // whether to render squares for extra days in week after endDate, and before start date
   tooltipDataAttrs: PropTypes.oneOfType([PropTypes.object, PropTypes.func]), // data attributes to add to square for setting 3rd party tooltips, e.g. { 'data-toggle': 'tooltip' } for bootstrap tooltips
   titleForValue: PropTypes.func, // function which returns title text for value
@@ -342,6 +372,7 @@ ContributionGraph.defaultProps = {
   squareSize: SQUARE_SIZE,
   horizontal: true,
   showMonthLabels: true,
+  showWeekLabels: false,
   showOutOfRangeDays: false,
   classForValue: value => (value ? "black" : "#8cc665")
 };
