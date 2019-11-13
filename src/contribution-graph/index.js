@@ -297,6 +297,23 @@ class ContributionGraph extends AbstractChart {
       ) : null;
     });
   }
+
+  getBoundingHeight() {
+    if (this.props.horizontal) {
+      return this.getWeekWidth() + 2 * this.getMonthLabelSize();
+    }
+
+    return this.getWeekCount() * this.getSquareSizeWithGutter();
+  }
+
+  getBoundingWidth() {
+    if (this.props.horizontal) {
+      return this.getWeekCount() * this.getSquareSizeWithGutter();
+    }
+
+    return this.getWeekWidth() + this.getMonthLabelSize();
+  }
+
   getSquareXOffset() {
     if (this.props.horizontal) {
       return 0;
@@ -314,15 +331,15 @@ class ContributionGraph extends AbstractChart {
     }
     return (
       <View style={style}>
-        <Svg height={this.props.height} width={this.props.width}>
+        <Svg height={this.getBoundingHeight()} width={this.getBoundingWidth()}>
           {this.renderDefs({
-            width: this.props.width,
-            height: this.props.height,
+            width: this.getBoundingWidth(),
+            height: this.getBoundingHeight(),
             ...this.props.chartConfig
           })}
           <Rect
             width="100%"
-            height={this.props.height}
+            height={this.getBoundingHeight()}
             rx={borderRadius}
             ry={borderRadius}
             fill="url(#backgroundGradient)"
