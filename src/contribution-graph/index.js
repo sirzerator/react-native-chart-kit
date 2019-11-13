@@ -246,7 +246,7 @@ class ContributionGraph extends AbstractChart {
           y={y - (this.props.horizontal ? LABEL_GUTTER_SIZE : 0)}
           {...this.getPropsForLabels()}
         >
-          {MONTH_LABELS[endOfWeek.getMonth()]}
+          {MONTH_LABELS[this.props.locale][endOfWeek.getMonth()]}
         </Text>
       ) : null;
     });
@@ -340,6 +340,7 @@ ContributionGraph.ViewPropTypes = {
   ]), // end of date range
   gutterSize: PropTypes.number, // size of space between squares
   horizontal: PropTypes.bool, // whether to orient horizontally or vertically
+  locale: PropTypes.string,
   numDays: PropTypes.number, // number of days back from endDate to show
   onClick: PropTypes.func, // callback function when a square is clicked
   showMonthLabels: PropTypes.bool, // whether to show month labels
@@ -364,6 +365,7 @@ ContributionGraph.defaultProps = {
   endDate: new Date(),
   gutterSize: 1,
   horizontal: true,
+  locale: 'en',
   numDays: 200,
   showMonthLabels: true,
   showOutOfRangeDays: false,
