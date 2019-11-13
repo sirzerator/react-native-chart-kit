@@ -16,7 +16,7 @@ import {
 } from "./dateHelpers";
 
 const SQUARE_SIZE = 20;
-const MONTH_LABEL_GUTTER_SIZE = 8;
+const LABEL_GUTTER_SIZE = 8;
 class ContributionGraph extends AbstractChart {
   constructor(props) {
     super(props);
@@ -42,7 +42,7 @@ class ContributionGraph extends AbstractChart {
       return 0;
     }
 
-    return squareSize + MONTH_LABEL_GUTTER_SIZE;
+    return squareSize;
   }
 
   getStartDate() {
@@ -157,27 +157,6 @@ class ContributionGraph extends AbstractChart {
     return [0, weekIndex * this.getSquareSizeWithGutter()];
   }
 
-  getTransformForMonthLabels() {
-    if (this.props.horizontal) {
-      return null;
-    }
-    return `${this.getWeekWidth() + MONTH_LABEL_GUTTER_SIZE}, 0`;
-  }
-
-  getTransformForAllWeeks() {
-    if (this.props.horizontal) {
-      return `0, ${this.getMonthLabelSize() - 100}`;
-    }
-    return null;
-  }
-
-  getViewBox() {
-    if (this.props.horizontal) {
-      return `${this.getWidth()} ${this.getHeight()}`;
-    }
-    return `${this.getHeight()} ${this.getWidth()}`;
-  }
-
   getSquareCoordinates(dayIndex) {
     if (this.props.horizontal) {
       return [0 + this.getSquareXOffset(), dayIndex * this.getSquareSizeWithGutter()];
@@ -185,11 +164,11 @@ class ContributionGraph extends AbstractChart {
     return [dayIndex * this.getSquareSizeWithGutter() + this.getSquareXOffset(), 0];
   }
 
-  getMonthLabelCoordinates(weekIndex) {
+  getLabelCoordinates(weekIndex) {
     if (this.props.horizontal) {
       return [
         weekIndex * this.getSquareSizeWithGutter(),
-        this.getMonthLabelSize() - MONTH_LABEL_GUTTER_SIZE
+        this.getMonthLabelSize()
       ];
     }
 
@@ -259,12 +238,12 @@ class ContributionGraph extends AbstractChart {
         this.getStartDateWithEmptyDays(),
         weekIndex * DAYS_IN_WEEK
       );
-      const [x, y] = this.getMonthLabelCoordinates(weekIndex);
+      const [x, y] = this.getLabelCoordinates(weekIndex);
       return this.isMonthLabel(endOfWeek) ? (
         <Text
           key={weekIndex}
           x={x}
-          y={y}
+          y={y - (this.props.horizontal ? LABEL_GUTTER_SIZE : 0)}
           {...this.getPropsForLabels()}
         >
           {MONTH_LABELS[endOfWeek.getMonth()]}
@@ -284,12 +263,12 @@ class ContributionGraph extends AbstractChart {
         this.getStartDateWithEmptyDays(),
         weekIndex * DAYS_IN_WEEK
       );
-      const [x, y] = this.getMonthLabelCoordinates(weekIndex);
+      const [x, y] = this.getLabelCoordinates(weekIndex);
       return !this.isMonthLabel(endOfWeek) ? (
         <Text
           key={weekIndex}
           x={x}
-          y={y}
+          y={y - (this.props.horizontal ? LABEL_GUTTER_SIZE : 0)}
           {...this.getPropsForLabels()}
         >
           {`${endOfWeek.getDate()}`}
