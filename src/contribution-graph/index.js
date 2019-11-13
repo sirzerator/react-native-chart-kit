@@ -17,7 +17,6 @@ import {
 
 const SQUARE_SIZE = 20;
 const MONTH_LABEL_GUTTER_SIZE = 8;
-const paddingLeft = 32;
 class ContributionGraph extends AbstractChart {
   constructor(props) {
     super(props);
@@ -154,9 +153,9 @@ class ContributionGraph extends AbstractChart {
 
   getTransformForWeek(weekIndex) {
     if (this.props.horizontal) {
-      return [weekIndex * this.getSquareSizeWithGutter(), 50];
+      return [weekIndex * this.getSquareSizeWithGutter(), this.getMonthLabelSize()];
     }
-    return [10, weekIndex * this.getSquareSizeWithGutter()];
+    return [0, weekIndex * this.getSquareSizeWithGutter()];
   }
 
   getTransformForMonthLabels() {
@@ -182,9 +181,9 @@ class ContributionGraph extends AbstractChart {
 
   getSquareCoordinates(dayIndex) {
     if (this.props.horizontal) {
-      return [0, dayIndex * this.getSquareSizeWithGutter()];
+      return [0 + this.getSquareXOffset(), dayIndex * this.getSquareSizeWithGutter()];
     }
-    return [dayIndex * this.getSquareSizeWithGutter(), 0];
+    return [dayIndex * this.getSquareSizeWithGutter() + this.getSquareXOffset(), 0];
   }
 
   getMonthLabelCoordinates(weekIndex) {
@@ -194,10 +193,10 @@ class ContributionGraph extends AbstractChart {
         this.getMonthLabelSize() - MONTH_LABEL_GUTTER_SIZE
       ];
     }
-    const verticalOffset = -2;
+
     return [
       0,
-      (weekIndex + 1) * this.getSquareSizeWithGutter() + verticalOffset
+      weekIndex * this.getSquareSizeWithGutter() + (this.getSquareSizeWithGutter() / 2)
     ];
   }
 
@@ -221,7 +220,7 @@ class ContributionGraph extends AbstractChart {
         key={index}
         width={squareSize}
         height={squareSize}
-        x={x + paddingLeft}
+        x={x}
         y={y}
         title={this.getTitleForIndex(index)}
         fill={this.getClassNameForIndex(index)}
@@ -261,14 +260,22 @@ class ContributionGraph extends AbstractChart {
       return endOfWeek.getDate() >= 1 && endOfWeek.getDate() <= DAYS_IN_WEEK ? (
         <Text
           key={weekIndex}
-          x={x + paddingLeft}
-          y={y + 8}
+          x={x}
+          y={y}
           {...this.getPropsForLabels()}
         >
           {MONTH_LABELS[endOfWeek.getMonth()]}
         </Text>
       ) : null;
     });
+  }
+
+  getSquareXOffset() {
+    if (this.props.horizontal) {
+      return 0;
+    }
+
+    return this.getMonthLabelSize();
   }
 
   render() {
