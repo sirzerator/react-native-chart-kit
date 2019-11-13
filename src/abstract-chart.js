@@ -3,17 +3,34 @@ import React, { Component } from "react";
 import { LinearGradient, Line, Text, Defs, Stop } from "react-native-svg";
 
 class AbstractChart extends Component {
+  getYAxisMaximum(data) {
+    if (typeof this.props.chartConfig.yAxisMaximum === 'number') {
+      return this.props.chartConfig.yAxisMaximum;
+    }
+
+    return Math.max(...data);
+  }
+
+  getYAxisMinimum(data) {
+    if (typeof this.props.chartConfig.yAxisMinimum === 'number') {
+      return this.props.chartConfig.yAxisMinimum;
+    }
+
+    return Math.min(...data);
+  }
+
   calcScaler = data => {
     if (this.props.fromZero) {
-      return Math.max(...data, 0) - Math.min(...data, 0) || 1;
+      return Math.max(...data, 0) - Math.min(...data, 0);
     } else {
-      return Math.max(...data) - Math.min(...data) || 1;
+      return (this.getYAxisMaximum(data)) - (this.getYAxisMinimum(data));
     }
   };
 
   calcBaseHeight = (data, height) => {
-    const min = Math.min(...data);
-    const max = Math.max(...data);
+    const min = this.getYAxisMinimum(data);
+    const max = this.getYAxisMaximum(data);
+
     if (min >= 0 && max >= 0) {
       return height;
     } else if (min < 0 && max <= 0) {
@@ -24,8 +41,9 @@ class AbstractChart extends Component {
   };
 
   calcHeight = (val, data, height) => {
-    const max = Math.max(...data);
-    const min = Math.min(...data);
+    const min = this.getYAxisMinimum(data);
+    const max = this.getYAxisMaximum(data);
+
     if (min < 0 && max > 0) {
       return height * (val / this.calcScaler(data));
     } else if (min >= 0 && max >= 0) {
@@ -111,7 +129,7 @@ class AbstractChart extends Component {
       } else {
         const label = this.props.fromZero
           ? (this.calcScaler(data) / (count - 1)) * i + Math.min(...data, 0)
-          : (this.calcScaler(data) / (count - 1)) * i + Math.min(...data);
+          : (this.calcScaler(data) / (count - 1)) * i + this.getYAxisMinimum(data);
         yLabel = `${yAxisLabel}${label.toFixed(decimalPlaces)}${yAxisSuffix}`;
       }
 
