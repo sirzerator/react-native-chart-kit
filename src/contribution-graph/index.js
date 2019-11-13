@@ -37,13 +37,12 @@ class ContributionGraph extends AbstractChart {
 
   getMonthLabelSize() {
     let { squareSize = SQUARE_SIZE } = this.props;
+
     if (!this.props.showMonthLabels) {
       return 0;
     }
-    if (this.props.horizontal) {
-      return squareSize + MONTH_LABEL_GUTTER_SIZE;
-    }
-    return 2 * (squareSize + MONTH_LABEL_GUTTER_SIZE);
+
+    return squareSize + MONTH_LABEL_GUTTER_SIZE;
   }
 
   getStartDate() {
